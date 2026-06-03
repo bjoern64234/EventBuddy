@@ -22,8 +22,8 @@ Trennen von API und Datenmodell.
 ---
 
 ### Aufgabe 13: Implementieren von Mapper Klassen
-- Implementiere einen EventMapper, welcher (Request)DTOs in Events und Events in (Response)DTOs umwandelt.
-- Implementiere einen ParticipantMapper, welcher (Request)DTOs in Participants umwandelt.
+- Implementiere einen EventMapper (static class), welcher (Request)DTOs in Events und Events in (Response)DTOs umwandelt.
+- Implementiere einen ParticipantMapper (static class), welcher (Request)DTOs in Participants umwandelt.
 - Brauchst du noch mehr Mapper? Wenn ja: Lege sie ebenfalls an!
 - Versehe deine Mapper Klassen mit der `@Component` Annotation und binde sie per Dependency Injection in die entsprechenden Services ein.
 
