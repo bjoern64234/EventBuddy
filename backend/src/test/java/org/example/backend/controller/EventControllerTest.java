@@ -42,11 +42,11 @@ class EventControllerTest {
 
         eventRequestDTO = EventRequestDTO.builder()
                 .name("test").isIndoor(true).date(date)
-                .totalCost(33.5).imageUrl("imageUrl").build();
+                .totalCost(33.5).imageUrl("https://test.de").build();
 
         eventResponseDTO = EventResponseDTO.builder()
                 .id(id).name("test").isIndoor(true)
-                .totalCost(33.5).imageUrl("imageUrl").build();
+                .totalCost(33.5).imageUrl("https://test.de").build();
     }
 
     @Test
@@ -61,7 +61,7 @@ class EventControllerTest {
                                 "isIndoor": true,
                                 "date": "2027-04-21T23:59:59",
                                 "totalCost": 33.5,
-                                "imageUrl": "imageUrl"
+                                "imageUrl": "https://test.de"
                             }
                         """))
                 .andExpect(status().isOk())
@@ -69,7 +69,7 @@ class EventControllerTest {
                 .andExpect(jsonPath("$.name").value("test"))
                 .andExpect(jsonPath("$.isIndoor").value(true))
                 .andExpect(jsonPath("$.totalCost").value(33.5))
-                .andExpect(jsonPath("$.imageUrl").value("imageUrl"));
+                .andExpect(jsonPath("$.imageUrl").value("https://test.de"));
 
         verify(eventService).create(eventRequestDTO);
     }
@@ -84,7 +84,7 @@ class EventControllerTest {
                 .andExpect(jsonPath("$[0].name").value("test"))
                 .andExpect(jsonPath("$[0].isIndoor").value(true))
                 .andExpect(jsonPath("$[0].totalCost").value(33.5))
-                .andExpect(jsonPath("$[0].imageUrl").value("imageUrl"));
+                .andExpect(jsonPath("$[0].imageUrl").value("https://test.de"));
 
         verify(eventService).getAll();
     }
@@ -110,7 +110,7 @@ class EventControllerTest {
                 .andExpect(jsonPath("$.name").value("test"))
                 .andExpect(jsonPath("$.isIndoor").value(true))
                 .andExpect(jsonPath("$.totalCost").value(33.5))
-                .andExpect(jsonPath("$.imageUrl").value("imageUrl"));
+                .andExpect(jsonPath("$.imageUrl").value("https://test.de"));
 
         verify(eventService).getById(id);
     }

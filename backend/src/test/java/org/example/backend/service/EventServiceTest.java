@@ -43,20 +43,20 @@ class EventServiceTest {
 
     @BeforeEach
     void setUp() {
-        id = "id";
+        id = "550e8400-e29b-41d4-a716-446655440000";
         date = LocalDateTime.of(2027, Month.APRIL, 21, 23, 59, 59);
 
         eventRequestDTO = EventRequestDTO.builder()
                 .name("test").isIndoor(true).date(date)
-                .totalCost(33.5).imageUrl("imageUrl").build();
+                .totalCost(33.5).imageUrl("https://test.de").build();
 
         event = Event.builder()
                 .id(id).name("test").isIndoor(true).date(date)
-                .totalCost(33.5).imageUrl("imageUrl").build();
+                .totalCost(33.5).imageUrl("https://test.de").build();
 
         eventResponseDTO = EventResponseDTO.builder()
                 .id(id).name("test").isIndoor(true)
-                .totalCost(33.5).imageUrl("imageUrl").build();
+                .totalCost(33.5).imageUrl("https://test.de").build();
     }
 
     @Test

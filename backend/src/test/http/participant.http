@@ -1,0 +1,17 @@
+### Save event
+POST {{localhost}}:{{port}}/api/participant
+Content-Type: application/json
+
+{
+  "name": "test",
+  "email": "test@email.de",
+  "profileImageUrl": "https://test.de"
+}
+
+> {%
+    var res = response.body
+    client.global.set("id", res.id)
+%}
+
+### Get all events
+GET {{localhost}}:{{port}}/api/participant
