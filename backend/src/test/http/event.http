@@ -7,7 +7,7 @@ Content-Type: application/json
   "isIndoor": true,
   "date": "2027-04-21T23:59:59",
   "totalCost": 33.5,
-  "imageUrl": "imageUrl"
+  "imageUrl": "https://test.de"
 }
 
 > {%
@@ -19,4 +19,4 @@ Content-Type: application/json
 GET {{localhost}}:{{port}}/api/event
 
 ### Get event by id
-GET {{localhost}}:{{port}}/api/event/{{id}}
+GET {{localhost}}:{{port}}/api/event/dcff2a63-9b50-46e8-b104
