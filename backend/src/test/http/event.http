@@ -19,4 +19,4 @@ Content-Type: application/json
 GET {{localhost}}:{{port}}/api/event
 
 ### Get event by id
-GET {{localhost}}:{{port}}/api/event/dcff2a63-9b50-46e8-b104
+GET {{localhost}}:{{port}}/api/event/{{id}}
