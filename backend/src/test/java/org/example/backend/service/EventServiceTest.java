@@ -2,6 +2,7 @@ package org.example.backend.service;
 
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
+import org.example.backend.exceptions.EventNotFoundException;
 import org.example.backend.model.Event;
 import org.example.backend.repository.EventRepo;
 import org.example.backend.utils.EventMapper;
@@ -15,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -130,7 +130,7 @@ class EventServiceTest {
         when(eventRepo.findById(id)).thenReturn(Optional.empty());
 
         // Then
-        assertThrows(NoSuchElementException.class, () -> eventService.getById(id));
+        assertThrows(EventNotFoundException.class, () -> eventService.getById(id));
         verify(eventRepo).findById(id);
     }
 }

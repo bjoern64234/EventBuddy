@@ -2,6 +2,7 @@ package org.example.backend.service;
 
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
+import org.example.backend.exceptions.EventNotFoundException;
 import org.example.backend.model.Event;
 import org.example.backend.repository.EventRepo;
 import org.example.backend.utils.EventMapper;
@@ -39,7 +40,7 @@ public class EventService {
     }
 
     public EventResponseDTO getById(String id) {
-        Event event = eventRepo.findById(id).orElseThrow(NoSuchElementException::new);
+        Event event = eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException(id));
         return this.eventMapper.toDTO(event);
     }
 }
