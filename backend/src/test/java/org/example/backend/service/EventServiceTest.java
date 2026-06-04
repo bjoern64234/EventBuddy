@@ -15,8 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -132,5 +131,53 @@ class EventServiceTest {
         // Then
         assertThrows(EventNotFoundException.class, () -> eventService.getById(id));
         verify(eventRepo).findById(id);
+    }
+
+    @Test
+    void addParticipant_shouldReturnEventResponseDTO_whenParticipantsIdsIsNull() {
+        // Given
+        Event eventWithoutParticipants = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(33.5).imageUrl("https://test.de")
+                .participantsIds(null).build();
+
+        Event updatedEvent = eventWithoutParticipants.withParticipantsIds(Set.of(this.id));
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithoutParticipants));
+        when(eventRepo.save(updatedEvent)).thenReturn(updatedEvent);
+        when(eventMapper.toDTO(updatedEvent)).thenReturn(eventResponseDTO);
+
+        // When
+        EventResponseDTO actual = eventService.addParticipant(id, this.id);
+
+        // Then
+        assertEquals(eventResponseDTO, actual);
+        verify(eventRepo).findById(id);
+        verify(eventRepo).save(updatedEvent);
+        verify(eventMapper).toDTO(updatedEvent);
+    }
+
+    @Test
+    void addParticipant_shouldAddToExistingList() {
+        // Given
+        Event eventWithExisting = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(33.5).imageUrl("https://test.de")
+                .participantsIds(new HashSet<>(List.of("550e8400-e29b-41d4-a716-446655440000"))).build();
+
+        Event updatedEvent = eventWithExisting.withParticipantsIds(Set.of("550e8400-e29b-41d4-a716-446655440000", "550e8400-e29b-41d4-a716-446655440111"));
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithExisting));
+        when(eventRepo.save(updatedEvent)).thenReturn(updatedEvent);
+        when(eventMapper.toDTO(updatedEvent)).thenReturn(eventResponseDTO);
+
+        // When
+        EventResponseDTO actual = eventService.addParticipant(id, "550e8400-e29b-41d4-a716-446655440111");
+
+        // Then
+        assertEquals(eventResponseDTO, actual);
+        verify(eventRepo).findById(id);
+        verify(eventRepo).save(updatedEvent);
+        verify(eventMapper).toDTO(updatedEvent);
     }
 }

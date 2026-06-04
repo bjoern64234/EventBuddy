@@ -35,4 +35,9 @@ public class EventController {
     public EventResponseDTO getById(@PathVariable @Pattern(regexp = "[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}", message = "The id must by a valid uuid") String id) {
         return this.eventService.getById(id);
     }
+
+    @GetMapping("/{eventId}/participant/{participantId}")
+    public EventResponseDTO addParticipantToEvent(@PathVariable String eventId, @PathVariable String participantId) {
+        return this.eventService.addParticipant(eventId, participantId);
+    }
 }

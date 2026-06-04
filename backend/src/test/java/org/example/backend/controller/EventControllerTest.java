@@ -124,4 +124,35 @@ class EventControllerTest {
 
         verify(eventService).getById(id);
     }
+
+    @Test
+    void addParticipantToEvent_shouldReturnEventResponseDTO() throws Exception {
+        // Given
+        String participantId = "660e8400-e29b-41d4-a716-446655440000";
+        when(eventService.addParticipant(id, participantId)).thenReturn(eventResponseDTO);
+
+        // When & Then
+        mockMvc.perform(get("/api/event/{eventId}/participant/{participantId}", id, participantId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value("test"))
+                .andExpect(jsonPath("$.isIndoor").value(true))
+                .andExpect(jsonPath("$.totalCost").value(33.5))
+                .andExpect(jsonPath("$.imageUrl").value("https://test.de"));
+
+        verify(eventService).addParticipant(id, participantId);
+    }
+
+    @Test
+    void addParticipantToEvent_shouldReturn404_whenEventNotFound() throws Exception {
+        // Given
+        String participantId = "660e8400-e29b-41d4-a716-446655440000";
+        when(eventService.addParticipant(id, participantId)).thenThrow(new EventNotFoundException(id));
+
+        // When & Then
+        mockMvc.perform(get("/api/event/{eventId}/participant/{participantId}", id, participantId))
+                .andExpect(status().isNotFound());
+
+        verify(eventService).addParticipant(id, participantId);
+    }
 }

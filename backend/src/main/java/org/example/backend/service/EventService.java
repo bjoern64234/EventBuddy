@@ -8,8 +8,7 @@ import org.example.backend.repository.EventRepo;
 import org.example.backend.utils.EventMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EventService {
@@ -41,5 +40,14 @@ public class EventService {
     public EventResponseDTO getById(String id) {
         Event event = eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException(id));
         return this.eventMapper.toDTO(event);
+    }
+
+    public EventResponseDTO addParticipant(String eventId, String participantId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+
+        Set<String> participantIds = (event.participantsIds() == null) ? new HashSet<>() : event.participantsIds();
+        participantIds.add(participantId);
+
+        return this.eventMapper.toDTO(this.eventRepo.save(event.withParticipantsIds(participantIds)));
     }
 }
