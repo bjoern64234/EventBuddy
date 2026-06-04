@@ -45,6 +45,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleException() {
-        return new ErrorMessage("Ooops! Something went wrong.", HttpStatus.INTERNAL_SERVER_ERROR.value(), LocalDateTime.now());
+        return new ErrorMessage("Ooops, something went wrong!", HttpStatus.INTERNAL_SERVER_ERROR.value(), LocalDateTime.now());
     }
 }

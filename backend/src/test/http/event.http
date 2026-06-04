@@ -1,0 +1,22 @@
+### Save event
+POST {{localhost}}:{{port}}/api/event
+Content-Type: application/json
+
+{
+  "name": "test",
+  "isIndoor": true,
+  "date": "2027-04-21T23:59:59",
+  "totalCost": 33.5,
+  "imageUrl": "imageUrl"
+}
+
+> {%
+    var res = response.body
+    client.global.set("id", res.id)
+ %}
+
+### Get all events
+GET {{localhost}}:{{port}}/api/event
+
+### Get event by id
+GET {{localhost}}:{{port}}/api/event/{{id}}
