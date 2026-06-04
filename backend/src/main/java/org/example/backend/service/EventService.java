@@ -2,11 +2,14 @@ package org.example.backend.service;
 
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
+import org.example.backend.model.Event;
 import org.example.backend.repository.EventRepo;
 import org.example.backend.utils.EventMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class EventService {
@@ -22,14 +25,21 @@ public class EventService {
     }
 
     public EventResponseDTO create(EventRequestDTO eventRequestDTO) {
-        return null;
+        Event newEvent = this.eventRepo.save(this.eventMapper.toEntity(eventRequestDTO, this.idService.generateId()));
+        return this.eventMapper.toDTO(newEvent);
     }
 
     public List<EventResponseDTO> getAll() {
-        return null;
+        List<Event> events = eventRepo.findAll();
+        List<EventResponseDTO> eventResponseDTOS = new ArrayList<>();
+
+        events.forEach(event -> eventResponseDTOS.add(this.eventMapper.toDTO(event)));
+
+        return eventResponseDTOS;
     }
 
     public EventResponseDTO getById(String id) {
-        return null;
+        Event event = eventRepo.findById(id).orElseThrow(NoSuchElementException::new);
+        return this.eventMapper.toDTO(event);
     }
 }
