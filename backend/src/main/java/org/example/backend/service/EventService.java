@@ -3,6 +3,7 @@ package org.example.backend.service;
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
 import org.example.backend.repository.EventRepo;
+import org.example.backend.utils.EventMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
