@@ -1,11 +1,13 @@
 package org.example.backend.service;
 
 import org.example.backend.dto.participant.ParticipantRequestDTO;
+import org.example.backend.dto.participant.ParticipantResponseDTO;
 import org.example.backend.model.Participant;
 import org.example.backend.repository.ParticipantRepo;
 import org.example.backend.utils.ParticipantMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,11 +23,16 @@ public class ParticipantService {
         this.idService = idService;
     }
 
-    public Participant create(ParticipantRequestDTO participantRequestDTO) {
-        return null;
+    public ParticipantResponseDTO create(ParticipantRequestDTO participantRequestDTO) {
+        return this.participantMapper.toDTO(this.participantRepo.save(this.participantMapper.toParticipant(participantRequestDTO, this.idService.generateId())));
     }
 
-    public List<Participant> getAll() {
-        return null;
+    public List<ParticipantResponseDTO> getAll() {
+        List<Participant> participants = this.participantRepo.findAll();
+        List<ParticipantResponseDTO> participantResponseDTOS = new ArrayList<>();
+
+        participants.forEach(participant -> participantResponseDTOS.add(this.participantMapper.toDTO(participant)));
+
+        return participantResponseDTOS;
     }
 }

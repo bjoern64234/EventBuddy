@@ -2,6 +2,7 @@ package org.example.backend.controller;
 
 import org.example.backend.dto.participant.ParticipantRequestDTO;
 import org.example.backend.dto.participant.ParticipantResponseDTO;
+import org.example.backend.service.ParticipantService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,13 +11,19 @@ import java.util.List;
 @RequestMapping("/api/participant")
 public class ParticipantController {
 
+    private final ParticipantService participantService;
+
+    public ParticipantController(ParticipantService participantService) {
+        this.participantService = participantService;
+    }
+
     @PostMapping()
     public ParticipantResponseDTO create(@RequestBody ParticipantRequestDTO participantRequestDTO) {
-        return null;
+        return this.participantService.create(participantRequestDTO);
     }
 
     @GetMapping()
     public List<ParticipantResponseDTO> getAll() {
-        return null;
+        return this.participantService.getAll();
     }
 }

@@ -1,6 +1,7 @@
 package org.example.backend.utils;
 
 import org.example.backend.dto.participant.ParticipantRequestDTO;
+import org.example.backend.dto.participant.ParticipantResponseDTO;
 import org.example.backend.model.Participant;
 import org.springframework.stereotype.Service;
 
@@ -13,5 +14,12 @@ public class ParticipantMapper {
                 .withName(participantRequestDTO.name())
                 .withEmail(participantRequestDTO.email())
                 .withProfileImageUrl(participantRequestDTO.profileImageUrl());
+    }
+
+    public ParticipantResponseDTO toDTO(Participant participant) {
+        return ParticipantResponseDTO.builder().build()
+                .withName(participant.name())
+                .withEmail(participant.email())
+                .withProfileImageUrl(participant.profileImageUrl());
     }
 }
