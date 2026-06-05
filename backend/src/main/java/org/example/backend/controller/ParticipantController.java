@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import jakarta.validation.Valid;
 import org.example.backend.dto.participant.ParticipantRequestDTO;
 import org.example.backend.dto.participant.ParticipantResponseDTO;
 import org.example.backend.service.ParticipantService;
@@ -18,7 +19,7 @@ public class ParticipantController {
     }
 
     @PostMapping()
-    public ParticipantResponseDTO create(@RequestBody ParticipantRequestDTO participantRequestDTO) {
+    public ParticipantResponseDTO create(@RequestBody @Valid ParticipantRequestDTO participantRequestDTO) {
         return this.participantService.create(participantRequestDTO);
     }
 
