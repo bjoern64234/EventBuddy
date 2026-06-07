@@ -2,9 +2,12 @@ package org.example.backend.service;
 
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
-import org.example.backend.exceptions.EventNotFoundException;
+import org.example.backend.exceptions.event.EventNotFoundException;
+import org.example.backend.exceptions.event.ParticipantsNotFoundException;
 import org.example.backend.model.Event;
+import org.example.backend.model.Participant;
 import org.example.backend.repository.EventRepo;
+import org.example.backend.repository.ParticipantRepo;
 import org.example.backend.utils.EventMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +33,8 @@ class EventServiceTest {
     private EventMapper eventMapper;
     @Mock
     private IdService idService;
+    @Mock
+    private ParticipantRepo participantRepo;
 
     @InjectMocks
     private EventService eventService;
@@ -179,5 +184,99 @@ class EventServiceTest {
         verify(eventRepo).findById(id);
         verify(eventRepo).save(updatedEvent);
         verify(eventMapper).toDTO(updatedEvent);
+    }
+
+    @Test
+    void splitCosts_shouldSplitCostsEvenlyAmongParticipants() {
+        // Given
+        String participantId1 = "550e8400-e29b-41d4-a716-446655440001";
+        String participantId2 = "550e8400-e29b-41d4-a716-446655440002";
+
+        Event eventWithParticipants = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(100.0).imageUrl("https://test.de")
+                .participantsIds(new HashSet<>(Set.of(participantId1, participantId2))).build();
+
+        Participant participant1 = Participant.builder().id(participantId1).build();
+        Participant participant2 = Participant.builder().id(participantId2).build();
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithParticipants));
+        when(participantRepo.findById(participantId1)).thenReturn(Optional.of(participant1));
+        when(participantRepo.findById(participantId2)).thenReturn(Optional.of(participant2));
+
+        // When
+        eventService.splitCosts(id);
+
+        // Then
+        verify(eventRepo).findById(id);
+        verify(participantRepo).save(participant1.withDept(50.0));
+        verify(participantRepo).save(participant2.withDept(50.0));
+    }
+
+    @Test
+    void splitCosts_shouldThrowException_whenEventNotFound() {
+        // Given
+        when(eventRepo.findById(id)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(EventNotFoundException.class, () -> eventService.splitCosts(id));
+        verify(eventRepo).findById(id);
+    }
+
+    @Test
+    void splitCosts_shouldThrowException_whenParticipantsIdsIsEmpty() {
+        // Given
+        Event eventWithoutParticipants = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(33.5).imageUrl("https://test.de")
+                .participantsIds(new HashSet<>()).build();
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithoutParticipants));
+
+        // Then
+        assertThrows(ParticipantsNotFoundException.class, () -> eventService.splitCosts(id));
+        verify(eventRepo).findById(id);
+    }
+
+    @Test
+    void splitCosts_shouldThrowException_whenParticipantNotFound() {
+        // Given
+        String participantId1 = "550e8400-e29b-41d4-a716-446655440001";
+
+        Event eventWithParticipants = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(33.5).imageUrl("https://test.de")
+                .participantsIds(new HashSet<>(Set.of(participantId1))).build();
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithParticipants));
+        when(participantRepo.findById(participantId1)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(ParticipantsNotFoundException.class, () -> eventService.splitCosts(id));
+        verify(eventRepo).findById(id);
+        verify(participantRepo).findById(participantId1);
+    }
+
+    @Test
+    void splitCosts_shouldSplitCostsForSingleParticipant() {
+        // Given
+        String participantId1 = "550e8400-e29b-41d4-a716-446655440001";
+
+        Event eventWithOneParticipant = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(33.5).imageUrl("https://test.de")
+                .participantsIds(new HashSet<>(Set.of(participantId1))).build();
+
+        Participant participant1 = Participant.builder().id(participantId1).build();
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithOneParticipant));
+        when(participantRepo.findById(participantId1)).thenReturn(Optional.of(participant1));
+
+        // When
+        eventService.splitCosts(id);
+
+        // Then
+        verify(eventRepo).findById(id);
+        verify(participantRepo).save(participant1.withDept(33.5));
     }
 }

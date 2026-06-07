@@ -2,7 +2,8 @@ package org.example.backend.controller;
 
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
-import org.example.backend.exceptions.EventNotFoundException;
+import org.example.backend.exceptions.event.EventNotFoundException;
+import org.example.backend.exceptions.event.ParticipantsNotFoundException;
 import org.example.backend.service.EventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -154,5 +154,46 @@ class EventControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(eventService).addParticipant(id, participantId);
+    }
+
+    @Test
+    void splitCosts_shouldReturn200WithMessage() throws Exception {
+        // When & Then
+        mockMvc.perform(get("/api/event/{eventId}/split-costs", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("split costs successfully"));
+
+        verify(eventService).splitCosts(id);
+    }
+
+    @Test
+    void splitCosts_shouldReturn404_whenEventNotFound() throws Exception {
+        // Given
+        doThrow(new EventNotFoundException(id)).when(eventService).splitCosts(id);
+
+        // When & Then
+        mockMvc.perform(get("/api/event/{eventId}/split-costs", id))
+                .andExpect(status().isNotFound());
+
+        verify(eventService).splitCosts(id);
+    }
+
+    @Test
+    void splitCosts_shouldReturn400_whenIdIsInvalid() throws Exception {
+        // When & Then
+        mockMvc.perform(get("/api/event/{eventId}/split-costs", "invalid-id"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void splitCosts_shouldReturn404_whenParticipantsNotFound() throws Exception {
+        // Given
+        doThrow(new ParticipantsNotFoundException(id)).when(eventService).splitCosts(id);
+
+        // When & Then
+        mockMvc.perform(get("/api/event/{eventId}/split-costs", id))
+                .andExpect(status().isNotFound());
+
+        verify(eventService).splitCosts(id);
     }
 }

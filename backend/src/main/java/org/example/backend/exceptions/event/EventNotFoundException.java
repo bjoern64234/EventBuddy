@@ -1,4 +1,4 @@
-package org.example.backend.exceptions;
+package org.example.backend.exceptions.event;
 
 import java.util.NoSuchElementException;
 

@@ -2,9 +2,12 @@ package org.example.backend.service;
 
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
-import org.example.backend.exceptions.EventNotFoundException;
+import org.example.backend.exceptions.event.EventNotFoundException;
+import org.example.backend.exceptions.event.ParticipantsNotFoundException;
 import org.example.backend.model.Event;
+import org.example.backend.model.Participant;
 import org.example.backend.repository.EventRepo;
+import org.example.backend.repository.ParticipantRepo;
 import org.example.backend.utils.EventMapper;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +17,13 @@ import java.util.*;
 public class EventService {
 
     private final EventRepo eventRepo;
+    private final ParticipantRepo participantRepo;
     private final EventMapper eventMapper;
     private final IdService idService;
 
-    public EventService(EventRepo eventRepo, EventMapper eventMapper, IdService idService) {
+    public EventService(EventRepo eventRepo, ParticipantRepo participantRepo, EventMapper eventMapper, IdService idService) {
         this.eventRepo = eventRepo;
+        this.participantRepo = participantRepo;
         this.eventMapper = eventMapper;
         this.idService = idService;
     }
@@ -49,5 +54,25 @@ public class EventService {
         participantIds.add(participantId);
 
         return this.eventMapper.toDTO(this.eventRepo.save(event.withParticipantsIds(participantIds)));
+    }
+
+    public void splitCosts(String eventId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        Set<String> participantsIds = event.participantsIds();
+
+        if(participantsIds.isEmpty()) {
+            throw new ParticipantsNotFoundException(event.name());
+        }
+
+        List<Participant> existingParticipants = participantsIds
+                .stream()
+                .map(participantsId -> this.participantRepo.findById(participantsId).orElseThrow(() -> new ParticipantsNotFoundException(participantsId)))
+                .toList();
+
+        double costsForEachParticipant = event.totalCost() / existingParticipants.size();
+
+        existingParticipants.forEach(participant -> {
+            this.participantRepo.save(participant.withDept(costsForEachParticipant));
+        });
     }
 }

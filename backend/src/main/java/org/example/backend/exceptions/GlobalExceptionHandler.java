@@ -2,6 +2,9 @@ package org.example.backend.exceptions;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.example.backend.exceptions.event.EventNotFoundException;
+import org.example.backend.exceptions.event.ParticipantsNotFoundException;
+import org.example.backend.exceptions.participant.ParticipantNotFoundException;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,6 +41,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ErrorMessage(ex.getMessage(), HttpStatus.NOT_FOUND.value(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(ParticipantsNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handleParticipantsNotFoundException(ParticipantsNotFoundException ex) {
+        return new ErrorMessage(ex.getMessage(), HttpStatus.NOT_FOUND.value(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ParticipantNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handleParticipantNotFoundException(ParticipantNotFoundException ex) {
+        return new ErrorMessage(ex.getMessage(), HttpStatus.NOT_FOUND.value(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleConstraintViolationException(ConstraintViolationException ex) {
@@ -48,9 +63,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ErrorMessage(messages, HttpStatus.BAD_REQUEST.value(), LocalDateTime.now());
     }
 
+/* For production
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessage handleException() {
+    public ErrorMessage handleException(Exception ex) {
         return new ErrorMessage("Ooops, something went wrong!", HttpStatus.INTERNAL_SERVER_ERROR.value(), LocalDateTime.now());
     }
+ */
 }

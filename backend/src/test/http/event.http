@@ -23,3 +23,6 @@ GET {{localhost}}:{{port}}/api/event/{{id}}
 
 ### Add participant to event
 GET {{localhost}}:{{port}}/api/event/{{id}}/participant/afb3392b-33c1-4040-96ea-dd70d48e3354
+
+### Split cost over all participants
+GET {{localhost}}:{{port}}/api/event/{{id}}/split-costs
