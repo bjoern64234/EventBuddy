@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.example.backend.exceptions.event.EventNotFoundException;
 import org.example.backend.exceptions.event.ParticipantsNotFoundException;
 import org.example.backend.exceptions.participant.ParticipantNotFoundException;
+import org.example.backend.exceptions.participant.PayDebtConflictException;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ErrorMessage(ex.getMessage(), HttpStatus.NOT_FOUND.value(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(PayDebtConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorMessage handlePayDebtConflictException(PayDebtConflictException ex) {
+        return new ErrorMessage(ex.getMessage(), HttpStatus.CONFLICT.value(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleConstraintViolationException(ConstraintViolationException ex) {
@@ -63,11 +70,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ErrorMessage(messages, HttpStatus.BAD_REQUEST.value(), LocalDateTime.now());
     }
 
-/* For production
+    // For testing
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleException(Exception ex) {
-        return new ErrorMessage("Ooops, something went wrong!", HttpStatus.INTERNAL_SERVER_ERROR.value(), LocalDateTime.now());
+        return new ErrorMessage(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), LocalDateTime.now());
     }
- */
 }

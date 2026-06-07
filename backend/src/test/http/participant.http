@@ -1,4 +1,4 @@
-### Save event
+### Save participant
 POST {{localhost}}:{{port}}/api/participant
 Content-Type: application/json
 
@@ -13,5 +13,16 @@ Content-Type: application/json
     client.global.set("id", res.id)
 %}
 
-### Get all events
+### Get all participants
 GET {{localhost}}:{{port}}/api/participant
+
+### Get participant by id
+GET {{localhost}}:{{port}}/api/participant/{{id}}
+
+### Pay debt for participant by id
+POST {{localhost}}:{{port}}/api/participant/afb3392b-33c1-4040-96ea-dd70d48e3354
+Content-Type: application/json
+
+{
+  "debt": 10.0
+}

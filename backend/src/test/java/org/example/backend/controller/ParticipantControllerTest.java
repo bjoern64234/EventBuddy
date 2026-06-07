@@ -2,6 +2,7 @@ package org.example.backend.controller;
 
 import org.example.backend.dto.participant.ParticipantRequestDTO;
 import org.example.backend.dto.participant.ParticipantResponseDTO;
+import org.example.backend.exceptions.participant.ParticipantNotFoundException;
 import org.example.backend.service.ParticipantService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -85,5 +86,43 @@ class ParticipantControllerTest {
                 .andExpect(jsonPath("$").isEmpty());
 
         verify(participantService).getAll();
+    }
+
+    @Test
+    void getById_shouldReturnParticipantResponseDTO() throws Exception {
+        // Given
+        when(participantService.getById(id)).thenReturn(responseDTO);
+
+        // When & Then
+        mockMvc.perform(get("/api/participant/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("test"))
+                .andExpect(jsonPath("$.email").value("test@email.de"))
+                .andExpect(jsonPath("$.profileImageUrl").value("https://test.de"));
+        verify(participantService).getById(id);
+    }
+
+    @Test
+    void payDebt_shouldReturnOk_whenAmountIsValid() throws Exception {
+        // When & Then
+        mockMvc.perform(post("/api/participant/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                            "debt": 50.0
+                        }
+                    """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("debt was paid successfully"));
+        verify(participantService).payDebt(id, 50.0);
+    }
+
+    @Test
+    void getById_shouldReturn404_whenNotFound() throws Exception {
+        when(participantService.getById(id))
+                .thenThrow(new ParticipantNotFoundException("Not found"));
+
+        mockMvc.perform(get("/api/participant/{id}", id))
+                .andExpect(status().isNotFound());
     }
 }

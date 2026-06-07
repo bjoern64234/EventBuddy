@@ -49,7 +49,7 @@ public class ParticipantService {
         if (amount > participant.dept()) {
             throw new PayDebtConflictException(amount);
         }
-        
+
         double currentDebt = participant.dept() - amount;
 
         this.participantRepo.save(participant.withDept(currentDebt));
