@@ -5,6 +5,7 @@ import org.example.backend.dto.participant.ParticipantRequestDTO;
 import org.example.backend.dto.participant.ParticipantResponseDTO;
 import org.example.backend.exceptions.event.EventNotFoundException;
 import org.example.backend.exceptions.event.ParticipantsNotFoundException;
+import org.example.backend.exceptions.participant.ParticipantNotFoundException;
 import org.example.backend.exceptions.participant.PayDebtConflictException;
 import org.example.backend.model.Participant;
 import org.example.backend.repository.ParticipantRepo;
@@ -127,7 +128,7 @@ class ParticipantServiceTest {
         when(this.participantRepo.findById(this.id)).thenReturn(Optional.empty());
 
         // Then
-        assertThrows(ParticipantsNotFoundException.class, () -> this.participantService.getById(id));
+        assertThrows(ParticipantNotFoundException.class, () -> this.participantService.getById(id));
         verify(this.participantRepo).findById(this.id);
     }
 
@@ -153,5 +154,6 @@ class ParticipantServiceTest {
         assertThrows(PayDebtConflictException.class,
                 () -> this.participantService.payDebt(id, 150.0));
         verify(this.participantRepo).findById(id);
+        verify(this.participantRepo, never()).save(any());
     }
 }

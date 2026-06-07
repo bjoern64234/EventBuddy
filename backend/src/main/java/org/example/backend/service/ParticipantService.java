@@ -2,6 +2,8 @@ package org.example.backend.service;
 
 import org.example.backend.dto.participant.ParticipantRequestDTO;
 import org.example.backend.dto.participant.ParticipantResponseDTO;
+import org.example.backend.exceptions.participant.ParticipantNotFoundException;
+import org.example.backend.exceptions.participant.PayDebtConflictException;
 import org.example.backend.model.Participant;
 import org.example.backend.repository.ParticipantRepo;
 import org.example.backend.utils.ParticipantMapper;
@@ -37,9 +39,19 @@ public class ParticipantService {
     }
 
     public ParticipantResponseDTO getById(String id) {
-        return this.participantRepo.getParticipantById(id);
+        Participant participant = this.participantRepo.findById(id).orElseThrow(() -> new ParticipantNotFoundException(id));
+        return this.participantMapper.toDTO(participant);
     }
 
     public void payDebt(String participantId, double amount) {
+        Participant participant = this.participantRepo.findById(participantId).orElseThrow(() -> new ParticipantNotFoundException(participantId));
+
+        if (amount > participant.dept()) {
+            throw new PayDebtConflictException(amount);
+        }
+        
+        double currentDebt = participant.dept() - amount;
+
+        this.participantRepo.save(participant.withDept(currentDebt));
     }
 }
