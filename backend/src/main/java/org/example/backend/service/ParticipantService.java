@@ -35,4 +35,11 @@ public class ParticipantService {
 
         return participantResponseDTOS;
     }
+
+    public ParticipantResponseDTO getById(String id) {
+        return this.participantRepo.getParticipantById(id);
+    }
+
+    public void payDebt(String participantId, double amount) {
+    }
 }

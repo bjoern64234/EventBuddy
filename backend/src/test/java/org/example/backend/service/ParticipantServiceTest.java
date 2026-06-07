@@ -1,7 +1,11 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.event.EventResponseDTO;
 import org.example.backend.dto.participant.ParticipantRequestDTO;
 import org.example.backend.dto.participant.ParticipantResponseDTO;
+import org.example.backend.exceptions.event.EventNotFoundException;
+import org.example.backend.exceptions.event.ParticipantsNotFoundException;
+import org.example.backend.exceptions.participant.PayDebtConflictException;
 import org.example.backend.model.Participant;
 import org.example.backend.repository.ParticipantRepo;
 import org.example.backend.utils.ParticipantMapper;
@@ -13,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -45,7 +50,7 @@ class ParticipantServiceTest {
                 .name("test").email("test@email.de").profileImageUrl("https://test.de").build();
 
         participant = Participant.builder()
-                .id(id).name("test").email("test@email.de").profileImageUrl("https://test.de").build();
+                .id(id).name("test").email("test@email.de").profileImageUrl("https://test.de").dept(100.0).build();
 
         responseDTO = ParticipantResponseDTO.builder()
                 .name("test").email("test@email.de").profileImageUrl("https://test.de").build();
@@ -99,5 +104,54 @@ class ParticipantServiceTest {
         // Then
         assertTrue(actual.isEmpty());
         verify(this.participantRepo).findAll();
+    }
+
+    @Test
+    void getById_shouldReturnParticipantResponseDTO() {
+        // Given
+        when(this.participantRepo.findById(this.id)).thenReturn(Optional.of(this.participant));
+        when(this.participantMapper.toDTO(this.participant)).thenReturn(this.responseDTO);
+
+        // When
+        ParticipantResponseDTO actual = this.participantService.getById(id);
+
+        // Then
+        assertEquals(responseDTO, actual);
+        verify(participantRepo).findById(id);
+        verify(participantMapper).toDTO(participant);
+    }
+
+    @Test
+    void getById_shouldThrowException_whenNotFound() {
+        // Given
+        when(this.participantRepo.findById(this.id)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(ParticipantsNotFoundException.class, () -> this.participantService.getById(id));
+        verify(this.participantRepo).findById(this.id);
+    }
+
+    @Test
+    void payDebt_shouldReduceDept_whenAmountIsLessThanGivenDept() {
+        // Given
+        when(this.participantRepo.findById(this.id)).thenReturn(Optional.of(participant));
+
+        // When
+        this.participantService.payDebt(this.id, 50.0);
+
+        // Then
+        verify(this.participantRepo).findById(this.id);
+        verify(this.participantRepo).save(participant.withDept(50.0));
+    }
+
+    @Test
+    void payDebt_shouldThrowException_whenAmountIsGreaterThanGivenDept() {
+        // Given
+        when(this.participantRepo.findById(id)).thenReturn(Optional.of(this.participant));
+
+        // Then
+        assertThrows(PayDebtConflictException.class,
+                () -> this.participantService.payDebt(id, 150.0));
+        verify(this.participantRepo).findById(id);
     }
 }
