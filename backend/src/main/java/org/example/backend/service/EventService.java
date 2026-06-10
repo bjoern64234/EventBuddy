@@ -2,10 +2,12 @@ package org.example.backend.service;
 
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
+import org.example.backend.dto.task.TaskRequestDTO;
 import org.example.backend.exceptions.event.EventNotFoundException;
 import org.example.backend.exceptions.event.ParticipantsNotFoundException;
 import org.example.backend.model.Event;
 import org.example.backend.model.Participant;
+import org.example.backend.model.Task;
 import org.example.backend.repository.EventRepo;
 import org.example.backend.repository.ParticipantRepo;
 import org.example.backend.utils.EventMapper;
@@ -74,5 +76,15 @@ public class EventService {
         existingParticipants.forEach(participant -> {
             this.participantRepo.save(participant.withDept(costsForEachParticipant));
         });
+    }
+
+    public EventResponseDTO addTask(String eventId, TaskRequestDTO taskDTO) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+
+        List<Task> tasks = (event.tasks() == null) ? new ArrayList<>() : event.tasks();
+
+        tasks.add(Task.builder().id(this.idService.generateId()).title(taskDTO.title()).completed(false).build());
+
+        return this.eventMapper.toDTO(this.eventRepo.save(event.withTasks(tasks)));
     }
 }

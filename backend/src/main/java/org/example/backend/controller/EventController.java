@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
+import org.example.backend.dto.task.TaskRequestDTO;
 import org.example.backend.service.EventService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -47,5 +48,10 @@ public class EventController {
     public ResponseEntity<Map<String, String>> splitCosts(@PathVariable @Pattern(regexp = "[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}", message = "The id must by a valid uuid") String eventId) {
         this.eventService.splitCosts(eventId);
         return ResponseEntity.ok(Map.of("message", "split costs successfully"));
+    }
+
+    @PostMapping("/{eventId}/task")
+    public EventResponseDTO addTask(@PathVariable @Pattern(regexp = "[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}", message = "The id must by a valid uuid") String eventId, @RequestBody @Valid TaskRequestDTO taskDTO) {
+        return this.eventService.addTask(eventId,  taskDTO);
     }
 }

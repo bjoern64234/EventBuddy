@@ -26,3 +26,11 @@ GET {{localhost}}:{{port}}/api/event/{{id}}/participant/afb3392b-33c1-4040-96ea-
 
 ### Split cost over all participants
 GET {{localhost}}:{{port}}/api/event/{{id}}/split-costs
+
+### Add new Task to event
+POST {{localhost}}:{{port}}/api/event/{{id}}/task
+Content-Type: application/json
+
+{
+  "title": "test"
+}

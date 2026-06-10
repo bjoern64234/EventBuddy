@@ -26,6 +26,8 @@ public class EventMapper {
                 .withIndoor(event.isIndoor())
                 .withTotalCost(event.totalCost())
                 .withRemainingCost(event.remainingCost())
-                .withImageUrl(event.imageUrl());
+                .withImageUrl(event.imageUrl())
+                .withParticipantsIds(event.participantsIds())
+                .withTasks(event.tasks());
     }
 }

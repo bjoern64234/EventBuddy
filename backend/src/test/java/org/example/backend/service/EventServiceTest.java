@@ -2,10 +2,12 @@ package org.example.backend.service;
 
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
+import org.example.backend.dto.task.TaskRequestDTO;
 import org.example.backend.exceptions.event.EventNotFoundException;
 import org.example.backend.exceptions.event.ParticipantsNotFoundException;
 import org.example.backend.model.Event;
 import org.example.backend.model.Participant;
+import org.example.backend.model.Task;
 import org.example.backend.repository.EventRepo;
 import org.example.backend.repository.ParticipantRepo;
 import org.example.backend.utils.EventMapper;
@@ -278,5 +280,85 @@ class EventServiceTest {
         // Then
         verify(eventRepo).findById(id);
         verify(participantRepo).save(participant1.withDept(33.5));
+    }
+
+    @Test
+    void addTask_shouldReturnEventResponseDTO_whenTasksListIsNull() {
+        // Given
+        TaskRequestDTO taskRequestDTO = TaskRequestDTO.builder()
+                .title("Kuchen backen").build();
+
+        Event eventWithoutTasks = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(33.5).imageUrl("https://test.de")
+                .tasks(null).build();
+
+        Task newTask = Task.builder()
+                .id(id).title("Kuchen backen").completed(false).build();
+
+        Event updatedEvent = eventWithoutTasks.withTasks(List.of(newTask));
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithoutTasks));
+        when(idService.generateId()).thenReturn(id);
+        when(eventRepo.save(updatedEvent)).thenReturn(updatedEvent);
+        when(eventMapper.toDTO(updatedEvent)).thenReturn(eventResponseDTO);
+
+        // When
+        EventResponseDTO actual = eventService.addTask(id, taskRequestDTO);
+
+        // Then
+        assertEquals(eventResponseDTO, actual);
+        verify(eventRepo).findById(id);
+        verify(idService).generateId();
+        verify(eventRepo).save(updatedEvent);
+        verify(eventMapper).toDTO(updatedEvent);
+    }
+
+    @Test
+    void addTask_shouldAddToExistingTasksList() {
+        // Given
+        TaskRequestDTO taskRequestDTO = TaskRequestDTO.builder()
+                .title("Neue Aufgabe").build();
+
+        Task existingTask = Task.builder()
+                .id("existing-task-id").title("Alte Aufgabe").completed(false).build();
+
+        Event eventWithTasks = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(33.5).imageUrl("https://test.de")
+                .tasks(new ArrayList<>(List.of(existingTask))).build();
+
+        Task newTask = Task.builder()
+                .id(id).title("Neue Aufgabe").completed(false).build();
+
+        Event updatedEvent = eventWithTasks.withTasks(List.of(existingTask, newTask));
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithTasks));
+        when(idService.generateId()).thenReturn(id);
+        when(eventRepo.save(updatedEvent)).thenReturn(updatedEvent);
+        when(eventMapper.toDTO(updatedEvent)).thenReturn(eventResponseDTO);
+
+        // When
+        EventResponseDTO actual = eventService.addTask(id, taskRequestDTO);
+
+        // Then
+        assertEquals(eventResponseDTO, actual);
+        verify(eventRepo).findById(id);
+        verify(idService).generateId();
+        verify(eventRepo).save(updatedEvent);
+        verify(eventMapper).toDTO(updatedEvent);
+    }
+
+    @Test
+    void addTask_shouldThrowException_whenEventNotFound() {
+        // Given
+        TaskRequestDTO taskRequestDTO = TaskRequestDTO.builder()
+                .title("Egal").build();
+
+        when(eventRepo.findById(id)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(EventNotFoundException.class, () -> eventService.addTask(id, taskRequestDTO));
+        verify(eventRepo).findById(id);
     }
 }

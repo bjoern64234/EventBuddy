@@ -196,4 +196,56 @@ class EventControllerTest {
 
         verify(eventService).splitCosts(id);
     }
+
+    @Test
+    void addTask_shouldReturnEventResponseDTO() throws Exception {
+        // Given
+        when(eventService.addTask(eq(id), any())).thenReturn(eventResponseDTO);
+
+        // When & Then
+        mockMvc.perform(post("/api/event/{eventId}/task", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                            "title": "Kuchen backen"
+                        }
+                    """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value("test"))
+                .andExpect(jsonPath("$.isIndoor").value(true))
+                .andExpect(jsonPath("$.totalCost").value(33.5))
+                .andExpect(jsonPath("$.imageUrl").value("https://test.de"));
+
+        verify(eventService).addTask(eq(id), any());
+    }
+
+    @Test
+    void addTask_shouldReturn404_whenEventNotFound() throws Exception {
+        // Given
+        when(eventService.addTask(eq(id), any())).thenThrow(new EventNotFoundException(id));
+
+        // When & Then
+        mockMvc.perform(post("/api/event/{eventId}/task", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                            "title": "Kuchen backen"
+                        }
+                    """))
+                .andExpect(status().isNotFound());
+
+        verify(eventService).addTask(eq(id), any());
+    }
+
+    @Test
+    void addTask_shouldReturn400_whenTitleIsMissing() throws Exception {
+        // When & Then
+        mockMvc.perform(post("/api/event/{eventId}/task", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {}
+                    """))
+                .andExpect(status().isBadRequest());
+    }
 }
