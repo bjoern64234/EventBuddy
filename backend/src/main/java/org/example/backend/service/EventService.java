@@ -5,6 +5,7 @@ import org.example.backend.dto.event.EventResponseDTO;
 import org.example.backend.dto.task.TaskRequestDTO;
 import org.example.backend.exceptions.event.EventNotFoundException;
 import org.example.backend.exceptions.event.ParticipantsNotFoundException;
+import org.example.backend.exceptions.event.TaskNotFoundException;
 import org.example.backend.model.Event;
 import org.example.backend.model.Participant;
 import org.example.backend.model.Task;
@@ -89,6 +90,17 @@ public class EventService {
     }
 
     public EventResponseDTO completeTask(String eventId, String taskId) {
-        return null;
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+
+        boolean filteredTask = event.tasks().stream()
+                .anyMatch(task -> Objects.equals(task.id(), taskId));
+
+        if (!filteredTask) {
+            throw new TaskNotFoundException(taskId);
+        }
+
+        List<Task> updatedTasks = event.tasks().stream().map(task -> Objects.equals(taskId, task.id()) ? task.withCompleted(true) : task).toList();
+
+        return this.eventMapper.toDTO(this.eventRepo.save(event.withTasks(updatedTasks)));
     }
 }

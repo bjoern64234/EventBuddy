@@ -57,6 +57,6 @@ public class EventController {
 
     @PutMapping("/{eventId}/task/{taskId}")
     public EventResponseDTO completeTask(@PathVariable @ValidUUID String eventId, @PathVariable @ValidUUID String taskId) {
-        return null;
+        return this.eventService.completeTask(eventId, taskId);
     }
 }

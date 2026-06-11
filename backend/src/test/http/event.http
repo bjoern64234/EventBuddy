@@ -34,3 +34,6 @@ Content-Type: application/json
 {
   "title": "test"
 }
+
+### Set task to completed
+PUT {{localhost}}:{{port}}/api/event/{{id}}/task/128dc7b2-b1a9-47a1-abd1-b466aaf0a9a9
