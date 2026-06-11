@@ -248,4 +248,52 @@ class EventControllerTest {
                     """))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void completeTask_shouldReturnEventResponseDTO() throws Exception {
+        // Given
+        String taskId = "660e8400-e29b-41d4-a716-446655440000";
+        when(eventService.completeTask(id, taskId)).thenReturn(eventResponseDTO);
+
+        // When & Then
+        mockMvc.perform(put("/api/event/{eventId}/task/{taskId}", id, taskId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value("test"))
+                .andExpect(jsonPath("$.isIndoor").value(true))
+                .andExpect(jsonPath("$.totalCost").value(33.5))
+                .andExpect(jsonPath("$.imageUrl").value("https://test.de"));
+
+        verify(eventService).completeTask(id, taskId);
+    }
+
+    @Test
+    void completeTask_shouldReturn404_whenEventNotFound() throws Exception {
+        // Given
+        String taskId = "660e8400-e29b-41d4-a716-446655440000";
+        when(eventService.completeTask(id, taskId)).thenThrow(new EventNotFoundException(id));
+
+        // When & Then
+        mockMvc.perform(put("/api/event/{eventId}/task/{taskId}", id, taskId))
+                .andExpect(status().isNotFound());
+
+        verify(eventService).completeTask(id, taskId);
+    }
+
+    @Test
+    void completeTask_shouldReturn400_whenEventIdIsInvalid() throws Exception {
+        // Given
+        String taskId = "660e8400-e29b-41d4-a716-446655440000";
+
+        // When & Then
+        mockMvc.perform(put("/api/event/{eventId}/task/{taskId}", "invalid-id", taskId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void completeTask_shouldReturn400_whenTaskIdIsInvalid() throws Exception {
+        // When & Then
+        mockMvc.perform(put("/api/event/{eventId}/task/{taskId}", id, "invalid-id"))
+                .andExpect(status().isBadRequest());
+    }
 }

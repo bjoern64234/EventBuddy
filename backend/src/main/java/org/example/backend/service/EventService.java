@@ -87,4 +87,8 @@ public class EventService {
 
         return this.eventMapper.toDTO(this.eventRepo.save(event.withTasks(tasks)));
     }
+
+    public EventResponseDTO completeTask(String eventId, String taskId) {
+        return null;
+    }
 }

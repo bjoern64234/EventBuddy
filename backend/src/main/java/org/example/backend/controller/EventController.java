@@ -1,11 +1,11 @@
 package org.example.backend.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import org.example.backend.dto.event.EventRequestDTO;
 import org.example.backend.dto.event.EventResponseDTO;
 import org.example.backend.dto.task.TaskRequestDTO;
 import org.example.backend.service.EventService;
+import org.example.backend.validation.ValidUUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public EventResponseDTO getById(@PathVariable @Pattern(regexp = "[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}", message = "The id must by a valid uuid") String id) {
+    public EventResponseDTO getById(@PathVariable @ValidUUID String id) {
         return this.eventService.getById(id);
     }
 
@@ -45,13 +45,18 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}/split-costs")
-    public ResponseEntity<Map<String, String>> splitCosts(@PathVariable @Pattern(regexp = "[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}", message = "The id must by a valid uuid") String eventId) {
+    public ResponseEntity<Map<String, String>> splitCosts(@PathVariable @ValidUUID String eventId) {
         this.eventService.splitCosts(eventId);
         return ResponseEntity.ok(Map.of("message", "split costs successfully"));
     }
 
     @PostMapping("/{eventId}/task")
-    public EventResponseDTO addTask(@PathVariable @Pattern(regexp = "[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}", message = "The id must by a valid uuid") String eventId, @RequestBody @Valid TaskRequestDTO taskDTO) {
+    public EventResponseDTO addTask(@PathVariable @ValidUUID String eventId, @RequestBody @Valid TaskRequestDTO taskDTO) {
         return this.eventService.addTask(eventId,  taskDTO);
+    }
+
+    @PutMapping("/{eventId}/task/{taskId}")
+    public EventResponseDTO completeTask(@PathVariable @ValidUUID String eventId, @PathVariable @ValidUUID String taskId) {
+        return null;
     }
 }

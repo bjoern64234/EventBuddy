@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.example.backend.exceptions.event.EventNotFoundException;
 import org.example.backend.exceptions.event.ParticipantsNotFoundException;
+import org.example.backend.exceptions.event.TaskNotFoundException;
 import org.example.backend.exceptions.participant.ParticipantNotFoundException;
 import org.example.backend.exceptions.participant.PayDebtConflictException;
 import org.jspecify.annotations.Nullable;
@@ -45,6 +46,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ParticipantsNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorMessage handleParticipantsNotFoundException(ParticipantsNotFoundException ex) {
+        return new ErrorMessage(ex.getMessage(), HttpStatus.NOT_FOUND.value(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handleTaskNotFoundException(TaskNotFoundException ex) {
         return new ErrorMessage(ex.getMessage(), HttpStatus.NOT_FOUND.value(), LocalDateTime.now());
     }
 

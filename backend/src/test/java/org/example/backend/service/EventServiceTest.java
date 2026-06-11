@@ -5,6 +5,7 @@ import org.example.backend.dto.event.EventResponseDTO;
 import org.example.backend.dto.task.TaskRequestDTO;
 import org.example.backend.exceptions.event.EventNotFoundException;
 import org.example.backend.exceptions.event.ParticipantsNotFoundException;
+import org.example.backend.exceptions.event.TaskNotFoundException;
 import org.example.backend.model.Event;
 import org.example.backend.model.Participant;
 import org.example.backend.model.Task;
@@ -359,6 +360,65 @@ class EventServiceTest {
 
         // Then
         assertThrows(EventNotFoundException.class, () -> eventService.addTask(id, taskRequestDTO));
+        verify(eventRepo).findById(id);
+    }
+
+    @Test
+    void completeTask_shouldReturnEventResponseDTO() {
+        // Given
+        String taskId = "660e8400-e29b-41d4-a716-446655440000";
+
+        Task task = Task.builder()
+                .id(taskId).title("Kuchen backen").completed(false).build();
+
+        Event eventWithTask = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(33.5).imageUrl("https://test.de")
+                .tasks(new ArrayList<>(List.of(task))).build();
+
+        Task completedTask = task.withCompleted(true);
+        Event updatedEvent = eventWithTask.withTasks(List.of(completedTask));
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithTask));
+        when(eventRepo.save(updatedEvent)).thenReturn(updatedEvent);
+        when(eventMapper.toDTO(updatedEvent)).thenReturn(eventResponseDTO);
+
+        // When
+        EventResponseDTO actual = eventService.completeTask(id, taskId);
+
+        // Then
+        assertEquals(eventResponseDTO, actual);
+        verify(eventRepo).findById(id);
+        verify(eventRepo).save(updatedEvent);
+        verify(eventMapper).toDTO(updatedEvent);
+    }
+
+    @Test
+    void completeTask_shouldThrowException_whenEventNotFound() {
+        // Given
+        String taskId = "660e8400-e29b-41d4-a716-446655440000";
+
+        when(eventRepo.findById(id)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(EventNotFoundException.class, () -> eventService.completeTask(id, taskId));
+        verify(eventRepo).findById(id);
+    }
+
+    @Test
+    void completeTask_shouldThrowException_whenTaskNotFound() {
+        // Given
+        String taskId = "660e8400-e29b-41d4-a716-446655440000";
+
+        Event eventWithoutMatchingTask = Event.builder()
+                .id(id).name("test").isIndoor(true).date(date)
+                .totalCost(33.5).imageUrl("https://test.de")
+                .tasks(new ArrayList<>()).build();
+
+        when(eventRepo.findById(id)).thenReturn(Optional.of(eventWithoutMatchingTask));
+
+        // Then
+        assertThrows(TaskNotFoundException.class, () -> eventService.completeTask(id, taskId));
         verify(eventRepo).findById(id);
     }
 }
