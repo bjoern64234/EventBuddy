@@ -1,0 +1,2 @@
+### Get 7 days forcast by city
+GET {{localhost}}:{{port}}/forecast?city=hamburg

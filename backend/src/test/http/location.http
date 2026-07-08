@@ -1,0 +1,2 @@
+### Get geolocation by query
+GET {{localhost}}:{{port}}/search?q=hamburg

@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.example.backend.exceptions.event.EventNotFoundException;
 import org.example.backend.exceptions.event.ParticipantsNotFoundException;
 import org.example.backend.exceptions.event.TaskNotFoundException;
+import org.example.backend.exceptions.location.LocationNotFoundException;
 import org.example.backend.exceptions.participant.ParticipantNotFoundException;
 import org.example.backend.exceptions.participant.PayDebtConflictException;
 import org.jspecify.annotations.Nullable;
@@ -65,6 +66,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorMessage handlePayDebtConflictException(PayDebtConflictException ex) {
         return new ErrorMessage(ex.getMessage(), HttpStatus.CONFLICT.value(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(LocationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handleLocationNotFoundException(LocationNotFoundException ex) {
+        return new ErrorMessage(ex.getMessage(), HttpStatus.NOT_FOUND.value(), LocalDateTime.now());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

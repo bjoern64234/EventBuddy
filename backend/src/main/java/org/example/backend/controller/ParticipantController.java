@@ -6,6 +6,7 @@ import org.example.backend.dto.participant.ParticipantRequestDTO;
 import org.example.backend.dto.participant.ParticipantResponseDTO;
 import org.example.backend.dto.participant.PayDebtRequestDTO;
 import org.example.backend.service.ParticipantService;
+import org.example.backend.validation.ValidUUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,12 +36,12 @@ public class ParticipantController {
     }
 
     @GetMapping("{id}")
-    public ParticipantResponseDTO getById(@PathVariable @Pattern(regexp = "[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}", message = "The id must by a valid uuid") String id) {
+    public ParticipantResponseDTO getById(@PathVariable @ValidUUID String id) {
         return this.participantService.getById(id);
     }
 
     @PostMapping("{id}")
-    public ResponseEntity<Map<String, String>> payDebt(@RequestBody @Valid PayDebtRequestDTO payDebtRequestDTO, @PathVariable @Pattern(regexp = "[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}", message = "The id must by a valid uuid") String id) {
+    public ResponseEntity<Map<String, String>> payDebt(@RequestBody @Valid PayDebtRequestDTO payDebtRequestDTO, @PathVariable @ValidUUID String id) {
         this.participantService.payDebt(id, payDebtRequestDTO.debt());
         return ResponseEntity.ok(Map.of("message", "debt was paid successfully"));
     }
